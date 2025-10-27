@@ -31,9 +31,9 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
-            name="pressable"
+            name="Caballero"
             options={{
-              title: "Página de Presionar",
+              title: "Caballeros",
               tabBarIcon: ({ color, focused }) => (
                 <Ionicons
                   name={focused ? "checkmark-circle" : "ellipse-outline"}
@@ -43,19 +43,7 @@ export default function TabsLayout() {
               ),
             }}
           />
-          <Tabs.Screen
-            name="about"
-            options={{
-              title: "About",
-              tabBarIcon: ({ color, focused }) => (
-                <Ionicons
-                  name={focused ? "information-circle" : "information-circle-outline"}
-                  color={color}
-                  size={24}
-                />
-              ),
-            }}
-          />
+
         <Tabs.Screen
           name="components/EmojiList"
           options={{
@@ -82,6 +70,36 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
           name="components/EmojiSticker"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="app"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="index1"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="pressable"
+          options={{
+          href: null, 
+        }}
+      />
+       <Tabs.Screen
+          name="caballerodetalle"
+          options={{
+          href: null, 
+        }}
+      />
+       <Tabs.Screen
+          name="about"
           options={{
           href: null, 
         }}

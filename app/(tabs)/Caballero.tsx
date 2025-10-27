@@ -13,9 +13,9 @@ import {
 import { Button } from "react-native-paper";
 import { useCaballero } from "./context/CaballerosContext"; // ⚠️ ajusta esta ruta según tu estructura
 
-// Ajusta esta URL según tu entorno (usa tu IP local real si estás en Expo)
-const API_URL = "http://localhost:4000";
 
+//const API_URL = "http://localhost:4000";
+const API_URL = "https://caballeros-backend.onrender.com";
 
 export default function CaballerosScreen() {
   const [caballeros, setCaballeros] = useState<Caballero[]>([]);
