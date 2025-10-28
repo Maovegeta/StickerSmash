@@ -29,8 +29,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "https://mi-backend-en-la-nube.example.com",
-      description: "Backend desplegado (reemplazar)",
+      url: "https://caballeros-backend.onrender.com",
+      description: "Backend desplegado ",
     },
     { url: "http://localhost:4000", description: "Servidor local de desarrollo" },
   ],
