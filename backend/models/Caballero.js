@@ -1,38 +1,38 @@
 import mongoose from "mongoose";
 
-// Definición del esquema (estructura del documento)
-const caballeroSchema = new mongoose.Schema(
+const CaballeroSchema = new mongoose.Schema(
   {
     nombre: {
       type: String,
-      required: true,
+      required: [true, "El nombre es obligatorio"],
       trim: true,
     },
     constelacion: {
       type: String,
-      required: true,
+      required: [true, "La constelación es obligatoria"],
       trim: true,
     },
     nivel: {
       type: String,
-      required: true,
-      trim: true,
+      required: [true, "El nivel es obligatorio"],
+      enum: ["Bronce", "Plata", "Oro"], // valores válidos
     },
     descripcion: {
       type: String,
+      required: [true, "La descripción es obligatoria"],
       trim: true,
     },
     imagen: {
       type: String,
-      trim: true,
+      required: [true, "La URL de la imagen es obligatoria"],
+      validate: {
+        validator: (url) =>
+          /^(https?:\/\/.*\.(?:png|jpg|jpeg|webp|gif|svg))$/i.test(url),
+        message: "La URL de la imagen no es válida o no apunta a una imagen",
+      },
     },
   },
-  {
-    timestamps: true, // agrega createdAt y updatedAt automáticamente
-    versionKey: false, // elimina el campo __v
-    collection: 'cualities', // usar la colección 'cualities' en la base de datos
-  }
+  { timestamps: true }
 );
 
-// Exportar el modelo
-export const Caballero = mongoose.model("Caballero", caballeroSchema, 'cualities');
+export const Caballero = mongoose.model("Caballero", CaballeroSchema);
