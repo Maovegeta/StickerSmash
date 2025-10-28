@@ -32,7 +32,10 @@ const CaballeroSchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true, 
+    versionKey: false, // elimina el campo __v
+    collection: 'cualities', // usar la colección 'cualities' en la base de datos
+    }
 );
 
-export const Caballero = mongoose.model("cualities", CaballeroSchema);
+export const Caballero = mongoose.model("Caballero", caballeroSchema, 'cualities');
