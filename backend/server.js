@@ -200,6 +200,6 @@ app.post("/caballeros", async (req, res) => {
 // ---------------------------------------------------------------------------
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`📘 Swagger Docs disponibles en http://localhost:${PORT}/api-docs`);
+  console.log(`🚀 Servidor corriendo en https://caballeros-backend.onrender.com:${PORT}`);
+  console.log(`📘 Swagger Docs disponibles en https://caballeros-backend.onrender.com:${PORT}/api-docs`);
 });
