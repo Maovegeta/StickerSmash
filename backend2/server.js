@@ -29,7 +29,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "https://caballeros-backend.onrender.com",
+      url: "https://hunter-backent.onrender.com",
       description: "Backend desplegado ",
     },
     { url: "http://localhost:4000", description: "Servidor local de desarrollo" },
