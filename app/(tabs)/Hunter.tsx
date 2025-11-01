@@ -19,7 +19,7 @@ const API_URL = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu end
   type Hunter = {
     _id?: string;
     nombre: string;
-    edad?: number;
+    edad?: number | string;
     anime?: string;
     nen?: { tipo?: string; habilidad?: string };
     personalidad?: string;
@@ -29,10 +29,9 @@ const API_URL = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu end
   };
 
   export default function HunterScreen() {
-    const { setHunterSeleccionado } = useHunter();
+    const { hunters, setHunterSeleccionado, addHunter, updateHunter } = useHunter();
     const router = useRouter();
 
-    const [hunters, setHunters] = useState<Hunter[]>([]);
     const [loading, setLoading] = useState(false);
     const [editingHunter, setEditingHunter] = useState<Hunter | null>(null);
     const [formData, setFormData] = useState<Hunter>({
@@ -50,11 +49,10 @@ const API_URL = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu end
       setLoading(true);
       try {
         const res = await fetch(`${API_URL}/hunters`);
-        const data = await res.json();
-        setHunters(data);
+        if (!res.ok) throw new Error('Error al obtener hunters');
       } catch (error) {
         console.error("❌ Error al obtener hunters:", error);
-        setHunters([]);
+        Alert.alert("Error", "No se pudieron cargar los hunters");
       } finally {
         setLoading(false);
       }
@@ -67,33 +65,50 @@ const API_URL = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu end
       }
 
       try {
-        const method = editingHunter ? "PUT" : "POST";
-        const url = editingHunter
-          ? `${API_URL}/hunters/${editingHunter._id}`
-          : `${API_URL}/hunters`;
-
-        const response = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-
-        if (response.ok) {
-          await fetchHunters();
-          setEditingHunter(null);
-          setFormData({
-            nombre: "",
-            edad: undefined,
-            anime: "Hunter x Hunter",
-            nen: { tipo: "", habilidad: "" },
-            personalidad: "",
-            objetivo: "",
-            mejorAmigo: "",
-            imagen: "",
+        if (editingHunter?._id) {
+          // Actualizar hunter existente
+          const response = await fetch(`${API_URL}/hunters/${editingHunter._id}`, {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
           });
+
+          if (response.ok) {
+            updateHunter({ ...formData, _id: editingHunter._id });
+          } else {
+            throw new Error('Error al actualizar');
+          }
+        } else {
+          // Crear nuevo hunter
+          const response = await fetch(`${API_URL}/hunters`, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+
+          if (response.ok) {
+            const newHunter = await response.json();
+            addHunter(newHunter);
+          } else {
+            throw new Error('Error al crear');
+          }
         }
+
+        // Limpiar formulario
+        setEditingHunter(null);
+        setFormData({
+          nombre: "",
+          edad: undefined,
+          anime: "Hunter x Hunter",
+          nen: { tipo: "", habilidad: "" },
+          personalidad: "",
+          objetivo: "",
+          mejorAmigo: "",
+          imagen: "",
+        });
       } catch (error) {
         console.error("Error guardando hunter:", error);
+        Alert.alert("Error", "No se pudo guardar el hunter");
       }
     };
 
@@ -119,8 +134,13 @@ const API_URL = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu end
     };
 
     const startEdit = (hunter: Hunter) => {
-      setEditingHunter(hunter);
-      setFormData(hunter);
+      // Asegurar que edad sea number si existe
+      const formattedHunter = {
+        ...hunter,
+        edad: hunter.edad ? Number(hunter.edad) : undefined
+      };
+      setEditingHunter(formattedHunter);
+      setFormData(formattedHunter);
     };
 
     useEffect(() => {
