@@ -38,4 +38,4 @@ const CaballeroSchema = new mongoose.Schema(
     }
 );
 
-export const Caballero = mongoose.model("Caballero", caballeroSchema, 'cualities');
+export const Caballero = mongoose.model("Caballero", CaballeroSchema, 'cualities');
