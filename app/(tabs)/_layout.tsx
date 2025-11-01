@@ -3,12 +3,14 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { CaballerosProvider } from './context/CaballerosContext';
 import { CounterProvider } from "./context/CounterContext";
+import { HunterProvider } from "./context/HunterContext";
 
 export default function TabsLayout() {
   return (
     <CaballerosProvider>
       <CounterProvider>
-        <Tabs
+        <HunterProvider>
+          <Tabs
           screenOptions={{
             tabBarActiveTintColor: "#3230adff",
             headerStyle: { backgroundColor: "#f61919ff" },
@@ -37,6 +39,19 @@ export default function TabsLayout() {
               tabBarIcon: ({ color, focused }) => (
                 <Ionicons
                   name={focused ? "checkmark-circle" : "ellipse-outline"}
+                  color={color}
+                  size={24}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="Hunter"
+            options={{
+              title: "Hunters",
+              tabBarIcon: ({ color, focused }) => (
+                <Ionicons
+                  name={focused ? "person" : "person-outline"}
                   color={color}
                   size={24}
                 />
@@ -105,6 +120,7 @@ export default function TabsLayout() {
         }}
       />
         </Tabs>
+        </HunterProvider>
       </CounterProvider>
     </CaballerosProvider>
   );
