@@ -88,7 +88,8 @@ export default function CaballerosScreen() {
       {searching && <ActivityIndicator />}
 
       {searchResults.length > 0 && (
-        <ScrollView style={styles.listContainer}>
+        // constrain search results height so the 'Ver Caballeros' button stays visible
+        <ScrollView style={styles.searchListContainer}>
           {searchResults.map((c) => (
             <TouchableOpacity
               key={c._id}
@@ -153,6 +154,11 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginTop: 20,
+    flex: 1,
+  },
+  searchListContainer: {
+    marginTop: 12,
+    maxHeight: 80,
   },
   card: {
     flexDirection: "row",
