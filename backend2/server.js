@@ -203,6 +203,35 @@ app.post('/hunters', async (req, res) => {
     res.status(400).json({ error: 'Error al agregar personaje', detalle: error.message });
   }
 });
+// Actualizar un hunter existente
+app.put('/hunters/:id', async (req, res) => {
+  try {
+    const actualizado = await Hunter.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!actualizado) {
+      return res.status(404).json({ error: "Personaje no encontrado" });
+    }
+
+    res.json({ mensaje: "Personaje actualizado correctamente", data: actualizado });
+  } catch (error) {
+    res.status(400).json({ error: 'Error al actualizar personaje', detalle: error.message });
+  }
+});
+
+app.delete('/hunters/:id', async (req, res) => {
+  try {
+    const eliminado = await Hunter.findByIdAndDelete(req.params.id);
+    if (!eliminado) return res.status(404).json({ error: "Personaje no encontrado" });
+
+    res.json({ mensaje: "Personaje eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar personaje", detalle: error.message });
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Iniciar servidor
