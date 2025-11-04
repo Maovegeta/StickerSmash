@@ -168,7 +168,7 @@ export default function HunterScreen() {
                 </Button>
                 <Button
                   mode="contained"
-                  onPress={() => handleDelete(item._id!)}
+                  onPress={() => handleDelete(item.nombre!)}
                   style={styles.deleteButton}
                 >
                   Eliminar
@@ -225,6 +225,20 @@ export default function HunterScreen() {
             placeholder="Objetivo"
             value={formData.objetivo}
             onChangeText={(t) => setFormData({ ...formData, objetivo: t })}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Personalidad"
+            value={formData.personalidad}
+            onChangeText={(t) => setFormData({ ...formData, personalidad: t })}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Mejor Amigo"
+            value={formData.mejorAmigo}
+            onChangeText={(t) => setFormData({ ...formData, mejorAmigo: t })}
           />
 
           <TextInput

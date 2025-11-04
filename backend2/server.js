@@ -222,7 +222,7 @@ app.put('/hunters/:id', async (req, res) => {
   }
 });
 
-app.delete('/hunters/:id', async (req, res) => {
+app.delete('/hunters/:nombre', async (req, res) => {
   try {
     const eliminado = await Hunter.findByIdAndDelete(req.params.id);
     if (!eliminado) return res.status(404).json({ error: "Personaje no encontrado" });
