@@ -97,25 +97,32 @@ export default function HunterScreen() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    Alert.alert("Confirmar", "¿Deseas eliminar este hunter?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Eliminar",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const res = await fetch(`${API_URL}/hunters/${id}`, {
-              method: "DELETE",
-            });
-            if (res.ok) fetchHunters();
-          } catch (error) {
-            console.error("Error eliminando hunter:", error);
+const handleDelete = async (id: string) => {
+  Alert.alert("Confirmar", "¿Deseas eliminar este hunter?", [
+    { text: "Cancelar", style: "cancel" },
+    {
+      text: "Eliminar",
+      style: "destructive",
+      onPress: async () => {
+        try {
+          console.log(`🗑️ Eliminando hunter con ID: ${id}`);
+
+          const res = await fetch(`${API_URL}/hunters/${id}`, {
+            method: "DELETE",
+          });
+
+          if (res.ok) {
+            fetchHunters(); // refresca la lista
+          } else {
+            console.error("❌ Error en el DELETE:", await res.text());
           }
-        },
+        } catch (error) {
+          console.error("⚠️ Error eliminando hunter:", error);
+        }
       },
-    ]);
-  };
+    },
+  ]);
+};
 
   const startEdit = (hunter: Hunter) => {
     setEditingHunter(hunter);
@@ -168,7 +175,7 @@ export default function HunterScreen() {
                 </Button>
                 <Button
                   mode="contained"
-                  onPress={() => handleDelete(item.nombre!)}
+                  onPress={() => handleDelete(item._id!)}
                   style={styles.deleteButton}
                 >
                   Eliminar
