@@ -181,7 +181,8 @@ app.delete("/personajes_hunter/:id", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3003;
-app.listen(PORT, () =>
-  console.log(`✅ backend3 listening on http://localhost:${PORT}`)
-);
+//const PORT = process.env.PORT || 3003;
+//app.listen(PORT, () =>
+//  console.log(`✅ backend3 listening on http://localhost:${PORT}`)
+//);
+start();
