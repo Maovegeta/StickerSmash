@@ -6,9 +6,12 @@ interface Hunter {
   edad?: number | string;
   anime?: string;
   nen?: { tipo?: string; habilidad?: string };
+  tiponen?: string;
+  habilidad: string;
   personalidad?: string;
   objetivo?: string;
   mejorAmigo?: string;
+  mejoramigo?: string;
   imagen?: string;
   active?: boolean;
 }

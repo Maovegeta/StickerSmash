@@ -1,11 +1,117 @@
 // backend3/server.js
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db/postgres");  // ← aquí ya no uses { pool }
+const pool = require("./db/postgres");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// --- Swagger / OpenAPI setup -------------------------------------------------
+const swaggerDefinition = {
+  openapi: "3.0.0",
+  info: {
+    title: "API Neon - Personajes Hunter",
+    version: "1.0.0",
+    description:
+      "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
+  },
+  servers: [
+    { url: "http://localhost:3003", description: "Servidor local (Neon/Postgres)" },
+    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado" },
+  ],
+};
+
+const options = {
+  definition: swaggerDefinition,
+  apis: [],
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+
+// Schema para Personaje (Neon)
+swaggerSpec.components = {
+  schemas: {
+    PersonajeHunter: {
+      type: "object",
+      properties: {
+        id: { type: "integer" },
+        nombre: { type: "string" },
+        edad: { type: "integer" },
+        anime: { type: "string" },
+        tiponen: { type: "string" },
+        habilidadnen: { type: "string" },
+        personalidad: { type: "string" },
+        objetivo: { type: "string" },
+        mejoramigo: { type: "string" },
+        imagen: { type: "string", format: "uri" },
+      },
+      example: {
+        id: 1,
+        nombre: "Gon Freecss",
+        edad: 12,
+        anime: "Hunter x Hunter",
+        tiponen: "Reforzador",
+        habilidadnen: "Jajanken",
+        personalidad: "Optimista",
+        objetivo: "Encontrar a su padre",
+        mejoramigo: "Killua",
+        imagen: "https://.../gon.png",
+      },
+    },
+  },
+};
+
+// Paths documentadas
+swaggerSpec.paths = {
+  "/personajes_hunter": {
+    get: {
+      summary: "Obtener todos los personajes (Neon/Postgres)",
+      responses: {
+        200: {
+          description: "Lista de personajes",
+          content: {
+            "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/PersonajeHunter" } } },
+          },
+        },
+      },
+    },
+    post: {
+      summary: "Crear nuevo personaje",
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": { schema: { $ref: "#/components/schemas/PersonajeHunter" } },
+        },
+      },
+      responses: {
+        201: { description: "Personaje creado" },
+      },
+    },
+  },
+  "/personajes_hunter/{id}": {
+    put: {
+      summary: "Actualizar personaje por ID",
+      parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+      requestBody: {
+        required: true,
+        content: { "application/json": { schema: { $ref: "#/components/schemas/PersonajeHunter" } } },
+      },
+      responses: { 200: { description: "Personaje actualizado" }, 404: { description: "No encontrado" } },
+    },
+    delete: {
+      summary: "Eliminar personaje por ID",
+      parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+      responses: { 200: { description: "Eliminado" }, 404: { description: "No encontrado" } },
+    },
+  },
+};
+
+// Servir Swagger UI y JSON
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 
 // ✅ GET → obtener personajes desde Neon
 app.get("/personajes_hunter", async (req, res) => {

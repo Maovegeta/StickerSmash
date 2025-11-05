@@ -43,6 +43,19 @@ export default function HunterDetalle() {
           </View>
         )}
 
+        {hunterSeleccionado.tiponen && (
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Tipo de Nen:</Text>
+            <Text style={styles.value}>{hunterSeleccionado.tiponen}</Text>
+          </View>
+        )}
+
+        {hunterSeleccionado.habilidad && (
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Tipo de Nen:</Text>
+            <Text style={styles.value}>{hunterSeleccionado.habilidad}</Text>
+          </View>
+        )}
         {hunterSeleccionado.nen?.habilidad && (
           <View style={styles.infoRow}>
             <Text style={styles.label}>Habilidad Nen:</Text>
@@ -71,6 +84,12 @@ export default function HunterDetalle() {
           </View>
         )}
 
+        {hunterSeleccionado.mejoramigo && (
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Mejor Amigo:</Text>
+            <Text style={styles.value}>{hunterSeleccionado.mejoramigo}</Text>
+          </View>
+        )}
         <Button 
           mode="contained" 
           onPress={() => router.back()}

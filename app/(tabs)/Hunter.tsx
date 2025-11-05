@@ -18,7 +18,7 @@ import { useHunter } from "./context/HunterContext";
 
 
 const API_MONGO = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu endpoint real
-const API_NEON = "http://localhost:3003"; 
+const API_NEON = "https://hunter-backent-neon.onrender.com"; 
 
 
 interface BaseHunter {
@@ -26,9 +26,12 @@ interface BaseHunter {
   edad?: number;
   anime: string;
   nen: { tipo: string; habilidad: string };
+  habilidad: string;
+  tiponen: string;
   personalidad: string;
   objetivo: string;
   mejorAmigo: string;
+  mejoramigo: string;
   imagen: string;
 }
 
@@ -60,9 +63,11 @@ export default function HunterScreen() {
     anime: "Hunter x Hunter",
     nen: { tipo: "", habilidad: "" },
     tiponen: "",
+    habilidad: "",
     personalidad: "",
     objetivo: "",
     mejorAmigo: "",
+    mejoramigo: "",
     imagen: "",
   });
 
@@ -157,9 +162,11 @@ const handleSave = async () => {
       anime: "Hunter x Hunter",
       nen: { tipo: "", habilidad: "" },
       tiponen: "",
+      habilidad: "",
       personalidad: "",
       objetivo: "",
       mejorAmigo: "",
+      mejoramigo: "",
       imagen: "",
     });
 
@@ -181,9 +188,11 @@ const handleEditNeon = (hunter: Hunter) => {
       habilidad: hunter.nen?.habilidad ?? "",
     },
     tiponen: "",
+    habilidad: "",
     personalidad: hunter.personalidad,
     objetivo: hunter.objetivo,
     mejorAmigo: hunter.mejorAmigo,
+    mejoramigo: hunter.mejoramigo,
     imagen: hunter.imagen,
   });
   setShowForm(true);

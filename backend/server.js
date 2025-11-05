@@ -138,21 +138,38 @@ swaggerSpec.paths = {
 };
 
 // Swagger UI y JSON
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Servir Swagger UI y la especificación JSON
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 
 // ---------------------------------------------------------------------------
-// Conexión a MongoDB Atlas
+// Conexión a MongoDB Atlas y arranque del servidor
+// Encapsulamos en una función async `start()` para evitar depender de top-level await
 const conectarMongo = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Conectado a MongoDB Atlas");
   } catch (error) {
-    console.error("❌ Error al conectar a MongoDB:", error.message);
+    console.error("❌ Error al conectar a MongoDB:", error?.message ?? error);
+    throw error;
+  }
+};
+
+const start = async () => {
+  try {
+    await conectarMongo();
+
+    // Iniciar servidor una vez la BD esté lista
+    app.listen(PORT, () => {
+      const host = process.env.BASE_URL || `http://localhost:${PORT}`;
+      console.log(`🚀 Servidor corriendo en ${host}`);
+      console.log(`📘 Swagger Docs disponibles en ${host}/api-docs`);
+    });
+  } catch (error) {
+    console.error("No fue posible iniciar la aplicación:", error);
     process.exit(1);
   }
 };
-await conectarMongo();
 
 // ---------------------------------------------------------------------------
 // Rutas API
@@ -198,8 +215,5 @@ app.post("/caballeros", async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en https://caballeros-backend.onrender.com:${PORT}`);
-  console.log(`📘 Swagger Docs disponibles en https://caballeros-backend.onrender.com:${PORT}/api-docs`);
-});
+// Iniciar servidor (arranca la conexión y luego el listen)
+start();
