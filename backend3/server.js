@@ -4,22 +4,10 @@ const cors = require("cors");
 const pool = require("./db/postgres");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
-const dotenv = require('dotenv');
-
-// Cargar variables de entorno
-dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3003;
-
-// Middlewares con opciones de seguridad
-app.use(cors({
-  origin: ['http://localhost:3003', 'https://hunter-backent-neon.onrender.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'accept'],
-}));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cors());
+app.use(express.json());
 
 // --- Swagger / OpenAPI setup -------------------------------------------------
 const swaggerDefinition = {
@@ -31,8 +19,7 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { url: "https://hunter-backent-neon.onrender.com", description: "Backend desplegado en producción" },
-    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" }
+    { url: "https://hunter-backent-neon.onrender.com", description: "Backend desplegado" },
   ],
 };
 
@@ -85,28 +72,9 @@ swaggerSpec.paths = {
         200: {
           description: "Lista de personajes",
           content: {
-            "application/json": { 
-              schema: { 
-                type: "array", 
-                items: { $ref: "#/components/schemas/PersonajeHunter" } 
-              } 
-            },
+            "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/PersonajeHunter" } } },
           },
         },
-        500: {
-          description: "Error del servidor",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  message: { type: "string", example: "Error consultando PostgreSQL" },
-                  detalle: { type: "string" }
-                }
-              }
-            }
-          }
-        }
       },
     },
     post: {
@@ -118,42 +86,7 @@ swaggerSpec.paths = {
         },
       },
       responses: {
-        201: {
-          description: "Personaje creado exitosamente",
-          content: {
-            "application/json": {
-              schema: { $ref: "#/components/schemas/PersonajeHunter" }
-            }
-          }
-        },
-        400: {
-          description: "Datos inválidos",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  message: { type: "string", example: "Error insertando personaje" },
-                  detalle: { type: "string" }
-                }
-              }
-            }
-          }
-        },
-        500: {
-          description: "Error del servidor",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  message: { type: "string" },
-                  detalle: { type: "string" }
-                }
-              }
-            }
-          }
-        }
+        201: { description: "Personaje creado" },
       },
     },
   },
@@ -179,41 +112,17 @@ swaggerSpec.paths = {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 
-// Ruta base de la API
-const router = express.Router();
-
-// Rutas principales
 app.get('/', (req, res) => {
   res.send('🛡️ API Hunters (backend3) funcionando correctamente');
 });
 
-// Middleware para verificar conexión a DB
-const checkDbConnection = async (req, res, next) => {
-  try {
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    next();
-  } catch (error) {
-    console.error("Error de conexión:", error);
-    res.status(500).json({ 
-      message: "Error de conexión a la base de datos",
-      detalle: error.message 
-    });
-  }
-};
-
 // ✅ GET → obtener personajes desde Neon
-router.get("/personajes_hunter", checkDbConnection, async (req, res) => {
+app.get("/personajes_hunter", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM personajes_hunter ORDER BY id ASC;");
     res.json(result.rows);
   } catch (error) {
-    console.error("Error en GET /personajes_hunter:", error);
-    res.status(500).json({ 
-      message: "Error consultando PostgreSQL", 
-      detalle: error.message 
-    });
+    res.status(500).json({ message: "Error consultando PostgreSQL", detalle: error.message });
   }
 });
 
@@ -275,39 +184,8 @@ app.delete("/personajes_hunter/:id", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// Funciones de conexión y arranque
-const testDbConnection = async () => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW()');
-    client.release();
-    console.log("✅ Conectado a PostgreSQL:", result.rows[0].now);
-    return true;
-  } catch (error) {
-    console.error("❌ Error conectando a PostgreSQL:", error?.message ?? error);
-    throw error;
-  }
-};
-
-const start = async () => {
-  try {
-    // Verificar conexión a la base de datos
-    await testDbConnection();
-
-    // Iniciar servidor
-    const host = process.env.BASE_URL || "https://hunter-backent-neon.onrender.com";
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en ${host}`);
-      console.log(`📘 Swagger Docs disponibles en ${host}/api-docs`);
-      console.log(`💡 API endpoints disponibles en ${host}/personajes_hunter`);
-    });
-  } catch (error) {
-    console.error("❌ No fue posible iniciar la aplicación:", error);
-    process.exit(1);
-  }
-};
-
-// ---------------------------------------------------------------------------
-// Iniciar servidor
+//const PORT = process.env.PORT || 3003;
+//app.listen(PORT, () =>
+  //console.log(`✅ backend3 listening on http://localhost:${PORT}`)
+//);
 start();
