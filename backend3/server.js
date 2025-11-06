@@ -13,7 +13,11 @@ const app = express();
 const PORT = process.env.PORT || 3003;
 
 // Middlewares con opciones de seguridad
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3003', 'https://hunter-backent.onrender.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'accept'],
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -27,8 +31,14 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado en producción" },
-    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" }
+    { 
+      url: "https://hunter-backent.onrender.com/api/v1",
+      description: "Backend desplegado en producción"
+    },
+    { 
+      url: "http://localhost:3003/api/v1",
+      description: "Servidor local (desarrollo)"
+    }
   ],
 };
 
@@ -175,17 +185,54 @@ swaggerSpec.paths = {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 
-app.get('/', (req, res) => {
-  res.send('🛡️ API Hunters (backend3) funcionando correctamente');
+// Ruta base de la API
+const router = express.Router();
+
+// Rutas principales
+router.get('/', (req, res) => {
+  res.json({ 
+    message: '🛡️ API Hunters (backend3) funcionando correctamente',
+    docs: '/api-docs',
+    endpoints: {
+      getAll: '/personajes_hunter',
+      getById: '/personajes_hunter/:id',
+      create: '/personajes_hunter',
+      update: '/personajes_hunter/:id',
+      delete: '/personajes_hunter/:id'
+    }
+  });
 });
 
+// Montar todas las rutas bajo /api/v1
+app.use('/api/v1', router);
+
+// Middleware para verificar conexión a DB
+const checkDbConnection = async (req, res, next) => {
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    next();
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    res.status(500).json({ 
+      message: "Error de conexión a la base de datos",
+      detalle: error.message 
+    });
+  }
+};
+
 // ✅ GET → obtener personajes desde Neon
-app.get("/personajes_hunter", async (req, res) => {
+router.get("/personajes_hunter", checkDbConnection, async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM personajes_hunter ORDER BY id ASC;");
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ message: "Error consultando PostgreSQL", detalle: error.message });
+    console.error("Error en GET /personajes_hunter:", error);
+    res.status(500).json({ 
+      message: "Error consultando PostgreSQL", 
+      detalle: error.message 
+    });
   }
 });
 
