@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3003;
 
 // Middlewares con opciones de seguridad
 app.use(cors({
-  origin: ['http://localhost:3003', 'https://hunter-backent.onrender.com'],
+  origin: ['http://localhost:3003', 'https://hunter-backent-neon.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'accept'],
 }));
@@ -31,7 +31,7 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado en producción" },
+    { url: "https://hunter-backent-neon.onrender.com", description: "Backend desplegado en producción" },
     { url: "http://localhost:3003", description: "Servidor local (desarrollo)" }
   ],
 };
@@ -183,20 +183,9 @@ app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 const router = express.Router();
 
 // Rutas principales
-router.get('/', (req, res) => {
-  res.json({ 
-    message: '🛡️ API Hunters (backend3) funcionando correctamente',
-    docs: '/api-docs',
-    endpoints: {
-      getAll: '/personajes_hunter',
-      getById: '/personajes_hunter/:id',
-      create: '/personajes_hunter',
-      update: '/personajes_hunter/:id',
-      delete: '/personajes_hunter/:id'
-    }
-  });
+app.get('/', (req, res) => {
+  res.send('🛡️ API Hunters (backend3) funcionando correctamente');
 });
-
 
 // Middleware para verificar conexión a DB
 const checkDbConnection = async (req, res, next) => {
@@ -307,7 +296,7 @@ const start = async () => {
     await testDbConnection();
 
     // Iniciar servidor
-    const host = process.env.BASE_URL || "https://hunter-backent.onrender.com";
+    const host = process.env.BASE_URL || "https://hunter-backent-neon.onrender.com";
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en ${host}`);
       console.log(`📘 Swagger Docs disponibles en ${host}/api-docs`);
