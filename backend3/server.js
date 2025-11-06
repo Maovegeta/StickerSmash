@@ -113,6 +113,10 @@ swaggerSpec.paths = {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 app.get("/swagger.json", (req, res) => res.json(swaggerSpec));
 
+app.get('/', (req, res) => {
+  res.send('🛡️ API Hunters (backend3) funcionando correctamente');
+});
+
 // ✅ GET → obtener personajes desde Neon
 app.get("/personajes_hunter", async (req, res) => {
   try {
