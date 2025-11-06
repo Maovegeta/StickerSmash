@@ -119,6 +119,73 @@ swaggerSpec.paths = {
       },
     },
   },
+  "/hunters/{id}": {
+    put: {
+      summary: "Actualizar personaje por ID",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+          description: "ID del personaje (MongoDB ObjectId)",
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": { schema: { $ref: "#/components/schemas/Hunter" } },
+        },
+      },
+      responses: {
+        200: {
+          description: "Personaje actualizado",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  mensaje: { type: "string" },
+                  data: { $ref: "#/components/schemas/Hunter" },
+                },
+              },
+            },
+          },
+        },
+        404: { description: "Personaje no encontrado" },
+        400: { description: "Error de validación o actualización" },
+      },
+    },
+    delete: {
+      summary: "Eliminar personaje por ID",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+          description: "ID del personaje (MongoDB ObjectId)",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Personaje eliminado correctamente",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  mensaje: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        404: { description: "Personaje no encontrado" },
+        500: { description: "Error al eliminar personaje" },
+      },
+    },
+  },
   "/hunters/search": {
     get: {
       summary: "Buscar personajes por nombre",
