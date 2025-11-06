@@ -1,15 +1,14 @@
+
 {
   "name": "stickersmash",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "expo lint"
-  },
+  "start": "expo start",
+  "web": "expo start --web",
+  "build": "npx expo export --platform web",
+  "vercel-build": "npm run build"
+},
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -53,7 +52,8 @@
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.10",
     "@types/react-dom": "~19.1.7",
-    "eslint": "^9.25.0"
+    "eslint": "^9.25.0",
+    "gh-pages": "^6.3.0"
   },
-  "private": true
+  "private": false
 }
