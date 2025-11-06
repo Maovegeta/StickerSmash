@@ -27,7 +27,8 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado" },
+    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" },
+    { url: "https://hunter-backend.onrender.com", description: "Backend desplegado" }
   ],
 };
 
@@ -80,9 +81,28 @@ swaggerSpec.paths = {
         200: {
           description: "Lista de personajes",
           content: {
-            "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/PersonajeHunter" } } },
+            "application/json": { 
+              schema: { 
+                type: "array", 
+                items: { $ref: "#/components/schemas/PersonajeHunter" } 
+              } 
+            },
           },
         },
+        500: {
+          description: "Error del servidor",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string", example: "Error consultando PostgreSQL" },
+                  detalle: { type: "string" }
+                }
+              }
+            }
+          }
+        }
       },
     },
     post: {
@@ -94,7 +114,42 @@ swaggerSpec.paths = {
         },
       },
       responses: {
-        201: { description: "Personaje creado" },
+        201: {
+          description: "Personaje creado exitosamente",
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/PersonajeHunter" }
+            }
+          }
+        },
+        400: {
+          description: "Datos inválidos",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string", example: "Error insertando personaje" },
+                  detalle: { type: "string" }
+                }
+              }
+            }
+          }
+        },
+        500: {
+          description: "Error del servidor",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                  detalle: { type: "string" }
+                }
+              }
+            }
+          }
+        }
       },
     },
   },
