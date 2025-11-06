@@ -31,14 +31,8 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { 
-      url: "https://hunter-backent.onrender.com/api/v1",
-      description: "Backend desplegado en producción"
-    },
-    { 
-      url: "http://localhost:3003/api/v1",
-      description: "Servidor local (desarrollo)"
-    }
+    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado en producción" },
+    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" }
   ],
 };
 
@@ -203,8 +197,6 @@ router.get('/', (req, res) => {
   });
 });
 
-// Montar todas las rutas bajo /api/v1
-app.use('/api/v1', router);
 
 // Middleware para verificar conexión a DB
 const checkDbConnection = async (req, res, next) => {
