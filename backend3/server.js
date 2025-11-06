@@ -27,8 +27,8 @@ const swaggerDefinition = {
       "Documentación OpenAPI para el servicio Neon (PostgreSQL) que expone la tabla personajes_hunter.",
   },
   servers: [
-    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" },
-    { url: "https://hunter-backend.onrender.com", description: "Backend desplegado" }
+    { url: "https://hunter-backent.onrender.com", description: "Backend desplegado en producción" },
+    { url: "http://localhost:3003", description: "Servidor local (desarrollo)" }
   ],
 };
 
@@ -268,10 +268,11 @@ const start = async () => {
     await testDbConnection();
 
     // Iniciar servidor
-    const host = process.env.BASE_URL || `http://localhost:${PORT}`;
+    const host = process.env.BASE_URL || "https://hunter-backent.onrender.com";
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en ${host}`);
       console.log(`📘 Swagger Docs disponibles en ${host}/api-docs`);
+      console.log(`💡 API endpoints disponibles en ${host}/personajes_hunter`);
     });
   } catch (error) {
     console.error("❌ No fue posible iniciar la aplicación:", error);
