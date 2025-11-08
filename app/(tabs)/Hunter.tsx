@@ -13,13 +13,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, Snackbar } from "react-native-paper";
 import { useHunter } from "./context/HunterContext";
 
 
 const API_MONGO = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu endpoint real
 const API_NEON = "https://hunter-backent-neon.onrender.com"; 
-
 
 interface BaseHunter {
   nombre: string;
@@ -56,6 +55,11 @@ export default function HunterScreen() {
   const [showForm, setShowForm] = useState(false);
   const [editingHunter, setEditingHunter] = useState<Hunter | null>(null);
   const [saveToMongo, setSaveToMongo] = useState(true); // por defecto Mongo
+  // Snackbar / confirm delete (for Neon)
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [pendingDeleteHunter, setPendingDeleteHunter] = useState<Hunter | null>(null);
+  
 
   const [formData, setFormData] = useState<Hunter>({
     nombre: "",
@@ -230,37 +234,45 @@ const handleDelete = (hunter: Hunter) => {
 // ✅ Eliminar en Neon
 const handleDeleteNeon = (hunter: Hunter) => {
   if (!isNeonHunter(hunter) || !hunter.id) return;
+  // Store pending hunter and show confirmation snackbar
+  setPendingDeleteHunter(hunter);
+  setSnackbarMsg(`¿Eliminar a ${hunter.nombre}?`);
+  setSnackbarVisible(true);
+};
 
-  Alert.alert("Confirmar", "¿Deseas eliminar este hunter?", [
-    { text: "Cancelar", style: "cancel" },
-    {
-      text: "Eliminar",
-      style: "destructive",
-      onPress: async () => {
-        try {
-          console.log(`🗑️ Eliminando hunter de Neon con ID: ${hunter.id}`);
+// Confirm deletion handler (reads pendingDeleteHunter)
+const confirmDelete = async () => {
+  const hunter = pendingDeleteHunter;
+  if (!hunter || !isNeonHunter(hunter) || !hunter.id) {
+    setSnackbarMsg("No hay hunter seleccionado para eliminar");
+    setSnackbarVisible(true);
+    return;
+  }
 
-          const res = await fetch(`${API_NEON}/personajes_hunter/${hunter.id}`, {
-            method: "DELETE",
-          });
+  try {
+    const res = await fetch(`${API_NEON}/personajes_hunter/${hunter.id}`, {
+      method: "DELETE",
+    });
 
-          if (res.ok) {
-            fetchHuntersNeon(); // 🔄 refresca la lista de Neon
-          } else {
-            console.error("❌ Error en el DELETE Neon:", await res.text());
-          }
-        } catch (error) {
-          console.error("⚠️ Error eliminando hunter en Neon:", error);
-        }
-      },
-    },
-  ]);
+    if (res.ok) {
+      setSnackbarMsg("✅ Hunter eliminado correctamente");
+      fetchHuntersNeon();
+    } else {
+      setSnackbarMsg("❌ Error eliminando hunter");
+    }
+  } catch (error) {
+    setSnackbarMsg("⚠️ Error eliminando hunter en Neon");
+  } finally {
+    setSnackbarVisible(true);
+    setPendingDeleteHunter(null);
+  }
 };
   const startEdit = (hunter: Hunter) => {
     setEditingHunter(hunter);
     setFormData(hunter);
     setShowForm(true);
   };
+  
 
   return (
     <View style={styles.container}>
@@ -311,6 +323,16 @@ const handleDeleteNeon = (hunter: Hunter) => {
                         >
                           Eliminar
                         </Button>
+                        <Snackbar
+                        visible={snackbarVisible}
+                        onDismiss={() => setSnackbarVisible(false)}
+                        action={{
+                          label: "Eliminar",
+                          onPress: confirmDelete,
+                        }}
+                      >
+                        {snackbarMsg}
+                      </Snackbar>
                       </View>
                     </View>
                   </TouchableOpacity>
