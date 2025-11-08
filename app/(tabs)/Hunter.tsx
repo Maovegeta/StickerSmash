@@ -184,8 +184,8 @@ const handleEditNeon = (hunter: Hunter) => {
     edad: hunter.edad,
     anime: hunter.anime,
     nen: {
-      tipo: hunter.nen?.tipo ?? "",
-      habilidad: hunter.nen?.habilidad ?? "",
+      tipo: isNeonHunter(hunter) ? hunter.tiponen ?? "" : hunter.nen?.tipo ?? "",
+      habilidad: isNeonHunter(hunter) ? hunter.habilidad ?? "" : hunter.nen?.habilidad ?? "",
     },
     tiponen: "",
     habilidad: "",
@@ -333,7 +333,7 @@ const handleDeleteNeon = (hunter: Hunter) => {
               <View>
                 <Text style={styles.name}>{item.nombre}</Text>
                 <Text>Edad: {item.edad}</Text>
-                <Text>Tipo Nen: {item.nen.tipo}</Text>
+                <Text>Tipo Nen: {item?.nen?.tipo ?? item?.tiponen ?? "No definido"}</Text>
               </View>
               <View style={styles.actions}>
                 <Button
