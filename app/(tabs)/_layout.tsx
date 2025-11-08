@@ -119,6 +119,30 @@ export default function TabsLayout() {
           href: null, 
         }}
       />
+      <Tabs.Screen
+          name="data"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="context/HunterContext"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="context/CounterContext"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="context/CaballerosContext"
+          options={{
+          href: null, 
+        }}
+      />
         </Tabs>
         </HunterProvider>
       </CounterProvider>

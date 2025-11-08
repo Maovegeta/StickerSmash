@@ -8,6 +8,7 @@
   "web": "expo start --web",
   "build": "npx expo export --platform web",
   "vercel-build": "npm run build"
+  
 },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

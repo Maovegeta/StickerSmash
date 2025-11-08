@@ -224,6 +224,8 @@ const start = async () => {
   }
 };
 
-// ---------------------------------------------------------------------------
-// Iniciar servidor
-start();
+if (process.env.NODE_ENV !== "test") {
+  start();
+}
+
+module.exports = app; // 👈 Exportar para los tests

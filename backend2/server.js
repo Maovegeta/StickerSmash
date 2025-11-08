@@ -318,4 +318,6 @@ app.delete('/hunters/:id', async (req, res) => {
 
 // ---------------------------------------------------------------------------
 // Iniciar servidor (arranca la conexión y luego el listen)
-start();
+if (process.env.NODE_ENV !== "test") {
+  start();
+}
