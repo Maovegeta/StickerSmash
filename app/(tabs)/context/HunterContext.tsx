@@ -5,7 +5,6 @@ interface Hunter {
   nombre: string;
   edad?: number | string;
   anime?: string;
-  nen?: { tipo?: string; habilidad?: string };
   tiponen?: string;
   habilidad: string;
   personalidad?: string;

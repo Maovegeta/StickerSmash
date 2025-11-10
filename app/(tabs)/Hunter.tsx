@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import { Button, Snackbar } from "react-native-paper";
 import { useHunter } from "./context/HunterContext";
+import { resilientFetch } from "./services/resilientFetch";
+import { Logger } from "./utils/logger";
 
 
 const API_MONGO = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu endpoint real
@@ -24,7 +26,6 @@ interface BaseHunter {
   nombre: string;
   edad?: number;
   anime: string;
-  nen: { tipo: string; habilidad: string };
   habilidad: string;
   tiponen: string;
   personalidad: string;
@@ -45,6 +46,7 @@ interface NeonHunter extends BaseHunter {
 
 type Hunter = MongoHunter | NeonHunter;
 
+
 export default function HunterScreen() {
   const { setHunterSeleccionado } = useHunter();
   const router = useRouter();
@@ -60,12 +62,12 @@ export default function HunterScreen() {
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [pendingDeleteHunter, setPendingDeleteHunter] = useState<Hunter | null>(null);
   
+  
 
   const [formData, setFormData] = useState<Hunter>({
     nombre: "",
     edad: undefined,
     anime: "Hunter x Hunter",
-    nen: { tipo: "", habilidad: "" },
     tiponen: "",
     habilidad: "",
     personalidad: "",
@@ -77,30 +79,49 @@ export default function HunterScreen() {
 
   // ✅ Consulta Mongo (Render)
   const fetchHuntersMongo = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_MONGO}/hunters`);
-      const data = await res.json();
-      setHuntersMongo(data);
-    } catch (error) {
-      console.error("❌ Error al obtener hunters desde Mongo:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  
+  Logger.info("▶ Iniciando consulta a Mongo...");
+  Logger.debug("URL utilizada:", API_MONGO);
+
+try {
+  const data = await resilientFetch(`${API_MONGO}/hunters`);
+  Logger.info("✅ Hunters obtenidos desde Mongo", data);
+  setHuntersNeon(data);
+} catch (error) {
+  Logger.error("❌ Error obteniendo datos desde Mongo", error);
+  Logger.warn("⛑ Cambiando al fallback: Neon");
+  fetchHuntersNeon();
+
+    fetchHuntersNeon();
+    mongoFailures++;
+    if (mongoFailures > FAILURE_LIMIT) return fetchHuntersNeon();
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ✅ Consulta PostgreSQL (Neon)
-  const fetchHuntersNeon = async () => {
-    try {
-      const res = await fetch(`${API_NEON}/personajes_hunter`);
-      const data = await res.json();
-      setHuntersNeon(data);
-    } catch (error) {
-      console.error("❌ Error al obtener hunters desde Neon:", error);
-    }
-  };
+ const fetchHuntersNeon = async () => {
+  Logger.info("▶ Iniciando consulta a Neon...");
+  Logger.debug("URL utilizada:", API_NEON);
 
-   // ✅ Se ejecuta cuando carga la pantalla
+try {
+  const data = await resilientFetch(`${API_NEON}/personajes_hunter`);
+  Logger.info("✅ Hunters obtenidos desde Neon", data);
+  setHuntersMongo(data);
+} catch (error) {
+  Logger.error("❌ Error obteniendo datos desde Neon", error);
+  Logger.warn("⛑ Cambiando al fallback: Mongo");
+  fetchHuntersMongo();
+  }
+};
+
+let mongoFailures = 0;
+let neonFailures = 0;
+const FAILURE_LIMIT = 3;
+   
   useEffect(() => {
     fetchHuntersMongo();
     fetchHuntersNeon();
@@ -164,7 +185,6 @@ const handleSave = async () => {
       nombre: "",
       edad: undefined,
       anime: "Hunter x Hunter",
-      nen: { tipo: "", habilidad: "" },
       tiponen: "",
       habilidad: "",
       personalidad: "",
@@ -187,12 +207,8 @@ const handleEditNeon = (hunter: Hunter) => {
     nombre: hunter.nombre,
     edad: hunter.edad,
     anime: hunter.anime,
-    nen: {
-      tipo: isNeonHunter(hunter) ? hunter.tiponen ?? "" : hunter.nen?.tipo ?? "",
-      habilidad: isNeonHunter(hunter) ? hunter.habilidad ?? "" : hunter.nen?.habilidad ?? "",
-    },
-    tiponen: "",
-    habilidad: "",
+    tiponen: hunter.tiponen,
+    habilidad: hunter.habilidad,
     personalidad: hunter.personalidad,
     objetivo: hunter.objetivo,
     mejorAmigo: hunter.mejorAmigo,
@@ -202,39 +218,20 @@ const handleEditNeon = (hunter: Hunter) => {
   setShowForm(true);
 };
 
+//  Eliminar en Mongo
 const handleDelete = (hunter: Hunter) => {
   if (!isMongoHunter(hunter) || !hunter._id) return;
 
-  Alert.alert("Confirmar", "¿Deseas eliminar este hunter?", [
-    { text: "Cancelar", style: "cancel" },
-    {
-      text: "Eliminar",
-      style: "destructive",
-      onPress: async () => {
-        try {
-          console.log(`🗑️ Eliminando hunter con ID: ${hunter._id}`);
-
-          const res = await fetch(`${API_MONGO}/hunters/${hunter._id}`, {
-            method: "DELETE",
-          });
-
-          if (res.ok) {
-            fetchHuntersMongo(); // refresca la lista
-          } else {
-            console.error("❌ Error en el DELETE:", await res.text());
-          }
-        } catch (error) {
-          console.error("⚠️ Error eliminando hunter:", error);
-        }
-      },
-    },
-  ]);
-};
+  setPendingDeleteHunter(hunter);
+  setSnackbarMsg(`¿Eliminar a ${hunter.nombre}?`);
+  setSnackbarVisible(true);
+  };
+  
 
 // ✅ Eliminar en Neon
 const handleDeleteNeon = (hunter: Hunter) => {
   if (!isNeonHunter(hunter) || !hunter.id) return;
-  // Store pending hunter and show confirmation snackbar
+  
   setPendingDeleteHunter(hunter);
   setSnackbarMsg(`¿Eliminar a ${hunter.nombre}?`);
   setSnackbarVisible(true);
@@ -243,25 +240,40 @@ const handleDeleteNeon = (hunter: Hunter) => {
 // Confirm deletion handler (reads pendingDeleteHunter)
 const confirmDelete = async () => {
   const hunter = pendingDeleteHunter;
-  if (!hunter || !isNeonHunter(hunter) || !hunter.id) {
+  if (!hunter) {
     setSnackbarMsg("No hay hunter seleccionado para eliminar");
     setSnackbarVisible(true);
     return;
   }
 
   try {
-    const res = await fetch(`${API_NEON}/personajes_hunter/${hunter.id}`, {
-      method: "DELETE",
-    });
+    let res;
+    if (isNeonHunter(hunter) && hunter.id) {
+      res = await fetch(`${API_NEON}/personajes_hunter/${hunter.id}`, {
+        method: "DELETE",
+      });
+    } else if (isMongoHunter(hunter) && hunter._id) {
+      res = await fetch(`${API_MONGO}/hunters/${hunter._id}`, {
+        method: "DELETE",
+      });
+    } else {
+      throw new Error("Hunter inválido para eliminar");
+    }
 
     if (res.ok) {
       setSnackbarMsg("✅ Hunter eliminado correctamente");
-      fetchHuntersNeon();
+      // Refresh the correct list based on hunter type
+      if (isNeonHunter(hunter)) {
+        fetchHuntersNeon();
+      } else {
+        fetchHuntersMongo();
+      }
     } else {
       setSnackbarMsg("❌ Error eliminando hunter");
     }
   } catch (error) {
-    setSnackbarMsg("⚠️ Error eliminando hunter en Neon");
+    setSnackbarMsg("⚠️ Error eliminando hunter");
+    console.error("Error al eliminar:", error);
   } finally {
     setSnackbarVisible(true);
     setPendingDeleteHunter(null);
@@ -355,7 +367,7 @@ const confirmDelete = async () => {
               <View>
                 <Text style={styles.name}>{item.nombre}</Text>
                 <Text>Edad: {item.edad}</Text>
-                <Text>Tipo Nen: {item?.nen?.tipo ?? item?.tiponen ?? "No definido"}</Text>
+                <Text>Tipo Nen: {item.tiponen}</Text>
               </View>
               <View style={styles.actions}>
                 <Button
@@ -404,18 +416,16 @@ const confirmDelete = async () => {
           <TextInput
             style={styles.input}
             placeholder="Tipo Nen"
-            value={formData.nen.tipo}
-            onChangeText={(t) =>
-              setFormData({ ...formData, nen: { ...formData.nen, tipo: t } })
+            value={formData.tiponen}
+            onChangeText={(t) => setFormData({ ...formData, tiponen: t } )
             }
           />
 
           <TextInput
             style={styles.input}
             placeholder="Habilidad Nen"
-            value={formData.nen.habilidad}
-            onChangeText={(t) =>
-              setFormData({ ...formData, nen: { ...formData.nen, habilidad: t } })
+            value={formData.habilidad}
+            onChangeText={(t) => setFormData({ ...formData, habilidad: t } )
             }
           />
 

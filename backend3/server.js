@@ -61,7 +61,7 @@ swaggerSpec.components = {
         edad: 12,
         anime: "Hunter x Hunter",
         tiponen: "Reforzador",
-        habilidadnen: "Jajanken",
+        habilidad: "Jajanken",
         personalidad: "Optimista",
         objetivo: "Encontrar a su padre",
         mejoramigo: "Killua",
