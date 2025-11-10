@@ -19,7 +19,7 @@ import { resilientFetch } from "./services/resilientFetch";
 import { Logger } from "./utils/logger";
 
 
-const API_MONGO = "https://hunter-backent.onrender.com"; // 🔧 Cambia por tu endpoint real
+const API_MONGO = "https://hunter-backent.onrender.com"; 
 const API_NEON = "https://hunter-backent-neon.onrender.com"; 
 
 interface BaseHunter {
@@ -31,7 +31,6 @@ interface BaseHunter {
   personalidad: string;
   objetivo: string;
   mejorAmigo: string;
-  mejoramigo: string;
   imagen: string;
 }
 
@@ -41,7 +40,7 @@ interface MongoHunter extends BaseHunter {
 
 interface NeonHunter extends BaseHunter {
   id?: number;
-  tiponen: string;
+  
 }
 
 type Hunter = MongoHunter | NeonHunter;
@@ -57,7 +56,6 @@ export default function HunterScreen() {
   const [showForm, setShowForm] = useState(false);
   const [editingHunter, setEditingHunter] = useState<Hunter | null>(null);
   const [saveToMongo, setSaveToMongo] = useState(true); // por defecto Mongo
-  // Snackbar / confirm delete (for Neon)
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [pendingDeleteHunter, setPendingDeleteHunter] = useState<Hunter | null>(null);
@@ -73,7 +71,6 @@ export default function HunterScreen() {
     personalidad: "",
     objetivo: "",
     mejorAmigo: "",
-    mejoramigo: "",
     imagen: "",
   });
 
@@ -190,7 +187,6 @@ const handleSave = async () => {
       personalidad: "",
       objetivo: "",
       mejorAmigo: "",
-      mejoramigo: "",
       imagen: "",
     });
 
@@ -212,7 +208,6 @@ const handleEditNeon = (hunter: Hunter) => {
     personalidad: hunter.personalidad,
     objetivo: hunter.objetivo,
     mejorAmigo: hunter.mejorAmigo,
-    mejoramigo: hunter.mejoramigo,
     imagen: hunter.imagen,
   });
   setShowForm(true);

@@ -49,7 +49,7 @@ swaggerSpec.components = {
         edad: { type: "integer" },
         anime: { type: "string" },
         tiponen: { type: "string" },
-        habilidadnen: { type: "string" },
+        habilidad: { type: "string" },
         personalidad: { type: "string" },
         objetivo: { type: "string" },
         mejoramigo: { type: "string" },

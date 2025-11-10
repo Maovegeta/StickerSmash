@@ -5,10 +5,8 @@ const hunterSchema = new mongoose.Schema(
     nombre: { type: String, required: [true, 'El nombre es obligatorio'], trim: true },
     edad: { type: Number },
     anime: { type: String, trim: true, default: 'Hunter x Hunter' },
-    nen: {
-      tipo: { type: String, trim: true },
-      habilidad: { type: String, trim: true },
-    },
+    tipo: { type: String, trim: true },
+    habilidad: { type: String, trim: true },
     personalidad: { type: String, trim: true },
     objetivo: { type: String, trim: true },
     mejorAmigo: { type: String, trim: true },
