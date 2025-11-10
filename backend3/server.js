@@ -52,7 +52,7 @@ swaggerSpec.components = {
         habilidad: { type: "string" },
         personalidad: { type: "string" },
         objetivo: { type: "string" },
-        mejoramigo: { type: "string" },
+        mejorAmigo: { type: "string" },
         imagen: { type: "string", format: "uri" },
       },
       example: {
@@ -64,7 +64,7 @@ swaggerSpec.components = {
         habilidad: "Jajanken",
         personalidad: "Optimista",
         objetivo: "Encontrar a su padre",
-        mejoramigo: "Killua",
+        mejorAmigo: "Killua",
         imagen: "https://.../gon.png",
       },
     },
@@ -138,13 +138,13 @@ app.get("/personajes_hunter", async (req, res) => {
 app.put("/personajes_hunter/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, edad, anime, tiponen, habilidadnen, personalidad, objetivo, mejoramigo, imagen } = req.body;
+    const { nombre, edad, anime, tiponen, habilidad, personalidad, objetivo, mejorAmigo, imagen } = req.body;
 
     const result = await pool.query(
       `UPDATE personajes_hunter
-        SET nombre=$1, edad=$2, anime=$3, tiponen=$4, habilidadnen=$5, personalidad=$6, objetivo=$7, mejoramigo=$8, imagen=$9
+        SET nombre=$1, edad=$2, anime=$3, tiponen=$4, habilidad=$5, personalidad=$6, objetivo=$7, mejoramigo=$8, imagen=$9
        WHERE id=$10 RETURNING *`,
-      [nombre, edad, anime, tiponen, habilidadnen, personalidad, objetivo, mejoramigo, imagen, id]
+      [nombre, edad, anime, tiponen, habilidad, personalidad, objetivo, mejorAmigo, imagen, id]
     );
 
     if (result.rowCount === 0) return res.status(404).json({ message: "No encontrado" });
@@ -159,14 +159,14 @@ app.put("/personajes_hunter/:id", async (req, res) => {
 app.post("/personajes_hunter", async (req, res) => {
   try {
     const {
-      nombre, edad, anime, tiponen, habilidadnen,
-      personalidad, objetivo, mejoramigo, imagen
+      nombre, edad, anime, tiponen, habilidad,
+      personalidad, objetivo, mejorAmigo, imagen
     } = req.body;
 
     const result = await pool.query(
-      `INSERT INTO personajes_hunter (nombre, edad, anime, tiponen, habilidadnen, personalidad, objetivo, mejoramigo, imagen)
+      `INSERT INTO personajes_hunter (nombre, edad, anime, tiponen, habilidad, personalidad, objetivo, mejorAmigo, imagen)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [nombre, edad, anime, tiponen, habilidadnen, personalidad, objetivo, mejoramigo, imagen]
+      [nombre, edad, anime, tiponen, habilidad, personalidad, objetivo, mejorAmigo, imagen]
     );
 
     res.status(201).json(result.rows[0]);

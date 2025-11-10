@@ -84,18 +84,15 @@ export default function HunterScreen() {
 try {
   const data = await resilientFetch(`${API_MONGO}/hunters`);
   Logger.info("✅ Hunters obtenidos desde Mongo", data);
-  setHuntersNeon(data);
+  setHuntersMongo(data);
 } catch (error) {
   Logger.error("❌ Error obteniendo datos desde Mongo", error);
   Logger.warn("⛑ Cambiando al fallback: Neon");
+  // fallback: intentar Neon
   fetchHuntersNeon();
-
-    fetchHuntersNeon();
-    mongoFailures++;
-    if (mongoFailures > FAILURE_LIMIT) return fetchHuntersNeon();
-  } finally {
-    setLoading(false);
-  }
+} finally {
+  setLoading(false);
+}
 };
 
 
@@ -107,12 +104,13 @@ try {
 try {
   const data = await resilientFetch(`${API_NEON}/personajes_hunter`);
   Logger.info("✅ Hunters obtenidos desde Neon", data);
-  setHuntersMongo(data);
+  setHuntersNeon(data);
 } catch (error) {
   Logger.error("❌ Error obteniendo datos desde Neon", error);
   Logger.warn("⛑ Cambiando al fallback: Mongo");
+  // fallback: intentar Mongo
   fetchHuntersMongo();
-  }
+}
 };
 
 let mongoFailures = 0;
@@ -311,35 +309,24 @@ const confirmDelete = async () => {
                     <View style={styles.card}>
                       <Text style={styles.name}>{item.nombre}</Text>
                       <Text>Edad: {item.edad}</Text>
-                      {isNeonHunter(item) && <Text>Tipo Nen: {item.tiponen}</Text>}
-                     
+                      <Text>Personalidad: {item.personalidad}</Text>
                      
                       <View style={styles.actions}>
-                        <Button
-                          mode="contained"
-                          onPress={() => handleEditNeon(item)}
-                          style={styles.editButton}
-                        >
-                          Editar
-                        </Button>
+                            <Button
+                              mode="contained"
+                              onPress={() => handleEditNeon(item)}
+                              style={styles.editButton}
+                            >
+                              Editar
+                            </Button>
 
-                        <Button
-                          mode="contained"
-                          onPress={() => handleDeleteNeon(item)}
-                          style={styles.deleteButton}
-                        >
-                          Eliminar
-                        </Button>
-                        <Snackbar
-                        visible={snackbarVisible}
-                        onDismiss={() => setSnackbarVisible(false)}
-                        action={{
-                          label: "Eliminar",
-                          onPress: confirmDelete,
-                        }}
-                      >
-                        {snackbarMsg}
-                      </Snackbar>
+                            <Button
+                              mode="contained"
+                              onPress={() => handleDeleteNeon(item)}
+                              style={styles.deleteButton}
+                            >
+                              Eliminar
+                            </Button>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -362,7 +349,7 @@ const confirmDelete = async () => {
               <View>
                 <Text style={styles.name}>{item.nombre}</Text>
                 <Text>Edad: {item.edad}</Text>
-                <Text>Tipo Nen: {item.tiponen}</Text>
+                <Text>Personalidad: {item.personalidad}</Text>
               </View>
               <View style={styles.actions}>
                 <Button
@@ -384,6 +371,15 @@ const confirmDelete = async () => {
           )}
         />
       )}
+
+      {/* Global Snackbar for confirm delete (works for both Neon and Mongo) */}
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        action={{ label: "Eliminar", onPress: confirmDelete }}
+      >
+        {snackbarMsg}
+      </Snackbar>
 
       <Modal visible={showForm} animationType="slide">
         <ScrollView style={styles.modal}>
