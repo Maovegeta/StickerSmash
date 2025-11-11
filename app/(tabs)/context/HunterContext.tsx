@@ -9,7 +9,7 @@ interface Hunter {
   habilidad?: string;
   personalidad?: string;
   objetivo?: string;
-  mejorAmigo?: string;
+  mejoramigo?: string;
   imagen?: string;
   active?: boolean;
 }

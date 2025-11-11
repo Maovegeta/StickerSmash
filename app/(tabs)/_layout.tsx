@@ -143,6 +143,18 @@ export default function TabsLayout() {
           href: null, 
         }}
       />
+        <Tabs.Screen
+          name="utils/logger"
+          options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+          name="services/resilientFetch"
+          options={{
+          href: null, 
+        }}
+      />
         </Tabs>
         </HunterProvider>
       </CounterProvider>

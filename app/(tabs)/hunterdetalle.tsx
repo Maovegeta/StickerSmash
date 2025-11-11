@@ -64,10 +64,10 @@ export default function HunterDetalle() {
           </View>
         )}
 
-        {hunterSeleccionado.mejorAmigo && (
+        {hunterSeleccionado.mejoramigo && (
           <View style={styles.infoRow}>
             <Text style={styles.label}>Mejor Amigo:</Text>
-            <Text style={styles.value}>{hunterSeleccionado.mejorAmigo}</Text>
+            <Text style={styles.value}>{hunterSeleccionado.mejoramigo}</Text>
           </View>
         )}
 

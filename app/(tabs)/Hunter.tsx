@@ -30,7 +30,7 @@ interface BaseHunter {
   tiponen: string;
   personalidad: string;
   objetivo: string;
-  mejorAmigo: string;
+  mejoramigo: string;
   imagen: string;
 }
 
@@ -70,7 +70,7 @@ export default function HunterScreen() {
     habilidad: "",
     personalidad: "",
     objetivo: "",
-    mejorAmigo: "",
+    mejoramigo: "",
     imagen: "",
   });
 
@@ -184,7 +184,7 @@ const handleSave = async () => {
       habilidad: "",
       personalidad: "",
       objetivo: "",
-      mejorAmigo: "",
+      mejoramigo: "",
       imagen: "",
     });
 
@@ -205,7 +205,7 @@ const handleEditNeon = (hunter: Hunter) => {
     habilidad: hunter.habilidad,
     personalidad: hunter.personalidad,
     objetivo: hunter.objetivo,
-    mejorAmigo: hunter.mejorAmigo,
+    mejoramigo: hunter.mejoramigo,
     imagen: hunter.imagen,
   });
   setShowForm(true);
@@ -437,8 +437,8 @@ const confirmDelete = async () => {
           <TextInput
             style={styles.input}
             placeholder="Mejor Amigo"
-            value={formData.mejorAmigo}
-            onChangeText={(t) => setFormData({ ...formData, mejorAmigo: t })}
+            value={formData.mejoramigo}
+            onChangeText={(t) => setFormData({ ...formData, mejoramigo: t })}
           />
 
           <TextInput
